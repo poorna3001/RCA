@@ -267,7 +267,7 @@ const dynamicStyles = `
 
   /* FIXED MODAL - NO OVERLAP */
   .tx-modal-overlay { 
-    position: fixed; 
+    position: absolute; 
     inset: 0; 
     background: rgba(6, 10, 18, 0.92); 
     backdrop-filter: blur(8px); 
@@ -294,17 +294,18 @@ const dynamicStyles = `
   .tx-modal-header { 
     display: flex; 
     justify-content: space-between; 
-    align-items: flex-start; 
-    padding: 24px 32px 18px 32px; 
+    align-items: center; 
+    padding: 20px 32px; 
     background: #0c1221; 
     flex-shrink: 0; 
     border-bottom: 1px solid rgba(99,179,237,0.1); 
     position: relative; 
     z-index: 30; 
+    min-height: 70px;
   }
   
   .tx-modal-title { 
-    font-size: 24px; 
+    font-size: 20px; 
     font-weight: 700; 
     color: #e2eaf6; 
     letter-spacing: -0.02em; 
@@ -312,9 +313,9 @@ const dynamicStyles = `
   }
   
   .tx-modal-subtitle { 
-    font-size: 14px; 
+    font-size: 13px; 
     color: #5a7499; 
-    margin-top: 4px; 
+    margin-top: 2px; 
     font-weight: 500; 
   }
   
@@ -323,8 +324,8 @@ const dynamicStyles = `
     border: none; 
     border-radius: 6px; 
     color: #fff; 
-    padding: 10px 20px; 
-    font-size: 14px; 
+    padding: 8px 18px; 
+    font-size: 13px; 
     font-weight: 600; 
     display: inline-flex; 
     align-items: center; 
@@ -341,7 +342,7 @@ const dynamicStyles = `
     font-size: 24px; 
     color: #5a7499; 
     cursor: pointer; 
-    padding: 4px; 
+    padding: 4px 8px; 
     line-height: 1; 
   }
   
@@ -357,9 +358,9 @@ const dynamicStyles = `
   }
   
   .tx-native-table { 
-    width: 100%; 
-    border-collapse: separate; 
-    border-spacing: 0; 
+    min-width: 100%;
+    width: max-content;
+    border-collapse: collapse; 
     text-align: left; 
     font-size: 13px; 
     table-layout: auto; 
@@ -370,30 +371,27 @@ const dynamicStyles = `
     font-weight: 700; 
     text-transform: uppercase; 
     color: #5a7499; 
-    padding: 16px 20px; 
+    padding: 12px 16px; 
     background-color: #0c1221; 
     border-bottom: 2px solid rgba(99,179,237,0.1); 
-    border-right: 1px solid rgba(99,179,237,0.05); 
     letter-spacing: 0.05em; 
     position: sticky; 
     top: 0; 
     z-index: 100; 
     white-space: nowrap; 
+    text-align: left;
   }
   
   .tx-native-table td { 
-    padding: 16px 20px; 
+    padding: 12px 16px; 
     border-bottom: 1px solid rgba(99,179,237,0.05); 
-    border-right: 1px solid rgba(99,179,237,0.02); 
     color: #e2eaf6; 
     font-weight: 500; 
-    line-height: 1.6; 
-    white-space: nowrap; 
-    max-width: 320px; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
+    line-height: 1.5; 
     vertical-align: middle; 
     background-color: #060a12; 
+    text-align: left;
+    white-space: nowrap;
   }
   
   .tx-native-table tbody tr:hover td { 
@@ -403,12 +401,10 @@ const dynamicStyles = `
   .tx-cell-bold { 
     font-weight: 700; 
     color: #e2eaf6; 
-    font-size: 13px; 
-    background-color: #080d1a; 
   }
   
   .tx-cell-subtext { 
-    font-size: 11px; 
+    font-size: 10px; 
     color: #5a7499; 
     font-weight: 500; 
     display: block; 
@@ -419,9 +415,9 @@ const dynamicStyles = `
     display: inline-flex; 
     align-items: center; 
     justify-content: center; 
-    padding: 4px 12px; 
-    border-radius: 6px; 
-    font-size: 11px; 
+    padding: 3px 10px; 
+    border-radius: 4px; 
+    font-size: 10px; 
     font-weight: 600; 
     background: rgba(59,158,255,0.15); 
     color: #3b9eff; 
@@ -433,17 +429,16 @@ const dynamicStyles = `
   .tx-cell-comment { 
     font-weight: 600; 
     color: #10e08a; 
-    background-color: rgba(16,224,138,0.05); 
-    max-width: 380px; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    font-size: 12.5px; 
+    background-color: rgba(16,224,138,0.03); 
+    min-width: 260px;
+    max-width: 360px;
+    white-space: normal;
+    word-break: break-word;
   }
   
   .tx-modal-footer { 
     background: #0c1221; 
-    padding: 16px 32px; 
+    padding: 14px 32px; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
@@ -464,8 +459,8 @@ const dynamicStyles = `
     border: none; 
     border-radius: 6px; 
     color: #e2eaf6; 
-    padding: 10px 24px; 
-    font-size: 14px; 
+    padding: 8px 20px; 
+    font-size: 13px; 
     font-weight: 600; 
     cursor: pointer; 
     transition: background 0.15s; 
@@ -554,6 +549,123 @@ const dynamicStyles = `
     align-items: center; 
     gap: 10px; 
   }
+
+  /* Comment editing styles */
+  .comment-edit-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  
+  .comment-text {
+    color: #10e08a;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    word-break: break-word;
+    font-size: 12px;
+  }
+  
+  .comment-text:hover {
+    background: rgba(16, 224, 138, 0.1);
+  }
+  
+  .comment-input {
+    background: var(--card2);
+    border: 1px solid var(--bdr2);
+    border-radius: 4px;
+    color: var(--txt);
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: var(--fb);
+    width: 100%;
+    min-width: 120px;
+  }
+  
+  .comment-input:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
+  
+  .comment-save-btn {
+    background: var(--teal);
+    border: none;
+    border-radius: 4px;
+    color: var(--bg);
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  
+  .comment-save-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(0, 212, 170, 0.3);
+  }
+  
+  .comment-save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .comment-cancel-btn {
+    background: var(--card);
+    border: 1px solid var(--bdr);
+    border-radius: 4px;
+    color: var(--muted);
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  
+  .comment-cancel-btn:hover {
+    border-color: var(--muted);
+    color: var(--txt);
+  }
+
+  .tx-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .tx-modal-header-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tx-modal-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  /* Column width classes */
+  .col-amount { min-width: 100px; }
+  .col-category { min-width: 160px; }
+  .col-date { min-width: 130px; }
+  .col-doc { min-width: 130px; }
+  .col-status { min-width: 110px; }
+  .col-sub { min-width: 160px; }
+  .col-vendor { min-width: 180px; }
+  .col-txid { min-width: 120px; }
+  .col-comment { min-width: 250px; }
+
+  /* Modal open - blur main content */
+  .modal-open .rca-container,
+  .modal-open .rca-dashboard-split-grid,
+  .modal-open .bottom-analytics-deck {
+    filter: blur(0px);
+  }
 `;
 
 const CATEGORY_ICONS = {
@@ -604,6 +716,9 @@ const RootCauseExplorer = () => {
   const [transactions, setTransactions] = useState([]);
   const [loadingTx, setLoadingTx] = useState(false);
   const [txError, setTxError] = useState(null);
+  const [editingComment, setEditingComment] = useState(null);
+  const [commentText, setCommentText] = useState('');
+  const [savingComment, setSavingComment] = useState(false);
   
   const svgRef = useRef(null);
   const canvasRef = useRef(null);
@@ -618,7 +733,19 @@ const RootCauseExplorer = () => {
     setTxError(null);
     
     try {
-      const url = `http://127.0.0.1:5001/rca/transactions/${encodeURIComponent(currentException)}`;
+      let url = `http://127.0.0.1:5001/rca/transactions/${encodeURIComponent(currentException)}`;
+      const params = new URLSearchParams();
+      if (selectedNode.level === 1) {
+        params.append('category', selectedNode.name);
+      } else if (selectedNode.level === 2) {
+        params.append('category', selectedNode.parentName);
+        params.append('sub_category', selectedNode.name);
+      }
+      const queryString = params.toString();
+      if (queryString) {
+        url += `?${queryString}`;
+      }
+      
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch transactions');
       const data = await res.json();
@@ -631,6 +758,51 @@ const RootCauseExplorer = () => {
       setLoadingTx(false); 
     }
   }, [selectedNode, currentException]);
+
+  const handleSaveComment = useCallback(async (transactionId, comment) => {
+    if (!currentException) return;
+    
+    setSavingComment(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:5001/rca/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          exception_name: currentException,
+          transaction_id: transactionId,
+          comment: comment
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save comment');
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        // Update local state
+        setTransactions(prev => 
+          prev.map(tx => {
+            const txId = tx.transaction_id || tx.id;
+            return txId === transactionId 
+              ? { ...tx, Comment: comment }
+              : tx;
+          })
+        );
+        setEditingComment(null);
+        setCommentText('');
+      } else {
+        throw new Error(result.error || 'Failed to save comment');
+      }
+    } catch (err) {
+      console.error('Error saving comment:', err);
+      alert('Failed to save comment. Please try again.');
+    } finally {
+      setSavingComment(false);
+    }
+  }, [currentException]);
 
   const handleCategorySelection = useCallback((catName) => {
     setSelectedCategory(catName);
@@ -690,6 +862,7 @@ const RootCauseExplorer = () => {
   useEffect(() => {
     setModalOpen(false);
     setTransactions([]);
+    setEditingComment(null);
   }, [currentException, location.pathname]);
 
   // Update category filter when exception changes
@@ -1000,386 +1173,497 @@ const RootCauseExplorer = () => {
 
   const correlations = getCorrelations();
 
+  // Get column class based on column name
+  const getColumnClass = (colName) => {
+    const lower = colName.toLowerCase();
+    if (lower.includes('amount') || lower.includes('value') || lower.includes('price')) return 'col-amount';
+    if (lower.includes('category')) return 'col-category';
+    if (lower.includes('date')) return 'col-date';
+    if (lower.includes('document') || lower.includes('doc')) return 'col-doc';
+    if (lower.includes('status')) return 'col-status';
+    if (lower.includes('sub') || lower.includes('sub-category')) return 'col-sub';
+    if (lower.includes('vendor') || lower.includes('customer')) return 'col-vendor';
+    if (lower.includes('transaction') || lower.includes('txn')) return 'col-txid';
+    if (lower.includes('comment')) return 'col-comment';
+    return '';
+  };
+
   return (
-    <div className="wrap" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', paddingBottom: '30px' }}>
-      <style>{dynamicStyles}</style>
-      
-      <div className="ph" style={{ flexShrink: 0, marginTop: '15px' }}>
-        <h1>Root Cause Tree Explorer</h1>
-        <p>Analyze exception root causes with interactive tree visualization</p>
-      </div>
-
-      <div className="filter-row-deck-container">
-        <div className="rca-sidebar-flex-stack" ref={dropdownCatRef}>
-          <div className="flbl" style={{ marginBottom: '6px', fontSize: '11px', color: '#5a7499', fontWeight: '600' }}>BUSINESS PROCESS CATEGORY</div>
-          <div className="rca-dropdown-wrapper">
-            <div className="rca-dropdown-trigger" onClick={() => setIsCatOpen(!isCatOpen)}>
-              <span>
-                <span style={{ marginRight: '8px' }}>{CATEGORY_ICONS[selectedCategory] || "📊"}</span>
-                {selectedCategory}
-              </span>
-              <svg className={`trigger-chevron ${isCatOpen ? 'open' : ''}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-            {isCatOpen && (
-              <ul className="rca-dropdown-overlay-list">
-                {categories.map((cat, idx) => (
-                  <li key={idx} className={`rca-dropdown-row-item ${selectedCategory === cat ? 'active' : ''}`} onClick={() => handleCategorySelection(cat)}>
-                    <span style={{ marginRight: '6px' }}>{CATEGORY_ICONS[cat] || "📁"}</span> {cat}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+    <>
+      {/* Main Content - Blurred when modal is open */}
+      <div className="wrap" style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: 'calc(100vh - 64px)', 
+        paddingBottom: '30px',
+        filter: modalOpen ? 'blur(6px)' : 'none',
+        pointerEvents: modalOpen ? 'none' : 'auto',
+        opacity: modalOpen ? 0.3 : 1,
+        transition: 'all 0.3s ease'
+      }}>
+        <style>{dynamicStyles}</style>
+        
+        <div className="ph" style={{ flexShrink: 0, marginTop: '15px' }}>
+          <h1>Root Cause Tree Explorer</h1>
+          <p>Analyze exception root causes with interactive tree visualization</p>
         </div>
 
-        <div className="rca-sidebar-flex-stack" ref={dropdownSubRef}>
-          <div className="flbl" style={{ marginBottom: '6px', fontSize: '11px', color: '#5a7499', fontWeight: '600' }}>ANOMALY MONITORING ENGINE EXCEPTIONS</div>
-          <div className="rca-dropdown-wrapper">
-            <div className="rca-dropdown-trigger" onClick={() => setIsSubOpen(!isSubOpen)}>
-              <span style={{ color: currentException ? '#e2eaf6' : '#5a7499' }}>
-                {currentException || "-- Choose Target Exception Module --"}
-              </span>
-              <svg className={`trigger-chevron ${isSubOpen ? 'open' : ''}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-            {isSubOpen && (
-              <ul className="rca-dropdown-overlay-list">
-                {filteredSubCategories.length === 0 ? (
-                  <li className="rca-dropdown-row-item" style={{ color: '#5a7499', cursor: 'default' }}>No exceptions found</li>
-                ) : (
-                  filteredSubCategories.map((sub, idx) => (
-                    <li key={idx} className={`rca-dropdown-row-item ${currentException === sub.name ? 'active' : ''}`} onClick={() => { setIsSubOpen(false); navigate(`/rca/${encodeURIComponent(sub.name)}`); }}>
-                      <span style={{ color: '#ff4d6a', marginRight: '6px' }}>⊚</span> {sub.name}
-                    </li>
-                  ))
-                )}
-              </ul>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {error && <div className="err" style={{ flexShrink: 0 }}>{error}</div>}
-
-      {!currentException ? (
-        <div className="loading ca" style={{ flexGrow: 1, border: '1px dashed var(--bdr2)', borderRadius: 'var(--rl)' }}>
-          <div style={{ fontSize: '40px', opacity: 0.5 }}>🔍</div>
-          <div className="ltxt" style={{ marginTop: '12px', color: '#5a7499' }}>Choose an exception from the dropdown above to view its root cause tree</div>
-        </div>
-      ) : loading ? (
-        <div className="loading ca" style={{ flexGrow: 1 }}><div className="spin"></div></div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div className="rca-dashboard-split-grid">
-            <div 
-              ref={canvasRef}
-              id="canvas-container" 
-              className="rca-tree-canvas" 
-              onMouseDown={handleMouseDown} 
-              onMouseMove={handleMouseMove} 
-              onMouseUp={handleMouseUp} 
-              onMouseLeave={handleMouseUp}
-            >
-              <div className="zoom-control-panel">
-                <button className="zoom-btn" onClick={() => setZoomScale(s => Math.min(1.5, s + 0.1))}>＋</button>
-                <button className="zoom-btn" onClick={() => setZoomScale(s => Math.max(0.3, s - 0.1))}>－</button>
-                <button className="zoom-btn" onClick={() => { setZoomScale(0.7); setPanOffset({ x: 20, y: 30 }); }} style={{fontSize: '10px'}}>⟳</button>
+        <div className="filter-row-deck-container">
+          <div className="rca-sidebar-flex-stack" ref={dropdownCatRef}>
+            <div className="flbl" style={{ marginBottom: '6px', fontSize: '11px', color: '#5a7499', fontWeight: '600' }}>BUSINESS PROCESS CATEGORY</div>
+            <div className="rca-dropdown-wrapper">
+              <div className="rca-dropdown-trigger" onClick={() => setIsCatOpen(!isCatOpen)}>
+                <span>
+                  <span style={{ marginRight: '8px' }}>{CATEGORY_ICONS[selectedCategory] || "📊"}</span>
+                  {selectedCategory}
+                </span>
+                <svg className={`trigger-chevron ${isCatOpen ? 'open' : ''}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </div>
-              <svg ref={svgRef} style={{ width: '100%', height: '100%', display: 'block', pointerEvents: 'all' }}></svg>
-            </div>
-
-            <div className="rca-sidebar-flex-stack">
-              {selectedNode && (
-                <div className="rca-details ca" style={{ background: 'var(--card)', border: '1px solid var(--bdr)', borderRadius: 'var(--rl)', padding: '24px', height: '100%', overflowY: 'auto' }}>
-                  <div style={{ fontSize: '12px', color: '#5a7499', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Node Details</div>
-                  
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px', marginBottom: '4px' }}>
-                    <h2 style={{ fontSize: '20px', color: '#fff', fontWeight: '800', fontFamily: 'var(--fd)' }}>
-                      {selectedNode.name.length > 20 ? selectedNode.name.substring(0, 18) + '...' : selectedNode.name}
-                    </h2>
-                    <div className="ai-badge">AI Analyzed</div>
-                  </div>
-
-                  <span className={`type-chip ${selectedNode.level === 0 ? 'exception' : selectedNode.level === 1 ? 'root-cause' : 'sub-cause'}`}>
-                    {selectedNode.level === 0 ? "Exception" : selectedNode.level === 1 ? "Root Cause" : "Sub Cause"}
-                  </span>
-
-                  {selectedNode.description && (
-                    <div style={{ marginTop: '12px', fontSize: '12px', color: '#a2b4dc', background: 'rgba(0,212,170,0.05)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(0,212,170,0.1)' }}>
-                      {selectedNode.description}
-                    </div>
-                  )}
-
-                  <div style={{ marginTop: '24px' }}>
-                    <div className="premium-metric-card">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', color: '#a2b4dc', fontWeight: '500' }}>AI Confidence Score</span>
-                        <span className="num" style={{ fontSize: '16px', color: '#fff', fontWeight: '700' }}>
-                          {selectedNode.count > 0 ? (75 + (selectedNode.pct * 0.2)).toFixed(0) : '95'}%
-                        </span>
-                      </div>
-                      <div className="metric-progress-container">
-                        <div className="metric-progress-bar purple" style={{ width: `${selectedNode.count > 0 ? Math.min(100, 75 + (selectedNode.pct * 0.2)) : 95}%` }}></div>
-                      </div>
-                      <div style={{ fontSize: '11px', color: '#5a7499', marginTop: '8px' }}>High Confidence Matching Profile</div>
-                    </div>
-
-                    <div className="premium-metric-card">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', color: '#a2b4dc', fontWeight: '500' }}>Impact Assessment</span>
-                        <span className="num" style={{ fontSize: '16px', color: '#fff', fontWeight: '700' }}>
-                          {selectedNode.count > 0 ? Math.round(selectedNode.pct) : 100}%
-                        </span>
-                      </div>
-                      <div className="metric-progress-container">
-                        <div className="metric-progress-bar orange" style={{ width: `${selectedNode.count > 0 ? Math.min(100, selectedNode.pct) : 100}%` }}></div>
-                      </div>
-                      <div style={{ fontSize: '11px', color: '#5a7499', marginTop: '8px' }}>
-                        {selectedNode.count > 0 ? (selectedNode.pct > 40 ? "Critical System Discrepancy" : "Moderate Operational Deviation") : "Critical System Discrepancy"}
-                      </div>
-                    </div>
-
-                    <div className="premium-metric-card" style={{ background: 'rgba(16, 224, 138, 0.03)', borderColor: 'rgba(16, 224, 138, 0.15)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', color: '#10e08a', fontWeight: '600' }}>Financial Impact</span>
-                        <span className="num" style={{ fontSize: '18px', color: '#10e08a', fontWeight: '800' }}>
-                          ₹{Math.round(selectedNode.value || 0).toLocaleString()}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '11px', color: '#5a7499', marginTop: '8px' }}>Total exception value affected by this node trail segment.</div>
-                    </div>
-
-                    <div className="premium-metric-card">
-                      <div style={{ fontSize: '11px', color: '#5a7499', textTransform: 'uppercase', marginBottom: '10px' }}>Node Information</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#5a7499' }}>Node ID:</span>
-                          <span className="num" style={{ color: '#fff', fontWeight: '600' }}>{selectedNode.id || 'root'}</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#5a7499' }}>System Level:</span>
-                          <span style={{ color: '#fff', fontWeight: '600' }}>L-{selectedNode.level || 0} Structural Branch</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span style={{ color: '#5a7499' }}>Total Records:</span>
-                          <span className="num" style={{ color: '#fff', fontWeight: '600' }}>{selectedNode.count?.toLocaleString() || 0}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="premium-metric-card" style={{ background: 'rgba(0, 212, 170, 0.02)', borderColor: 'rgba(0, 212, 170, 0.12)' }}>
-                      <div style={{ fontSize: '12px', color: '#00d4aa', fontWeight: '600', marginBottom: '6px' }}>AI Analysis Summary</div>
-                      <p style={{ fontSize: '12px', color: '#a2b4dc', lineHeight: '1.5' }}>
-                        This node segment has been processed across machine learning categorization vectors. The metric exposure values represent total calculated variance frequencies inside your ERP cluster.
-                      </p>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--card2)', padding: '14px', borderRadius: '10px', marginTop: '16px', border: '1px solid var(--bdr)' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', maxWidth: '55%' }}>
-                        <span style={{ fontSize: '12px', color: '#fff', fontWeight: '600' }}>Affected Transactions</span>
-                        <span style={{ fontSize: '10px', color: '#5a7499' }}>Review complete transaction logs</span>
-                      </div>
-                      <button className="view-tx-btn-premium" onClick={handleViewTransactions}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        View Transactions
-                      </button>
-                    </div>
-                  </div>
-                </div>
+              {isCatOpen && (
+                <ul className="rca-dropdown-overlay-list">
+                  {categories.map((cat, idx) => (
+                    <li key={idx} className={`rca-dropdown-row-item ${selectedCategory === cat ? 'active' : ''}`} onClick={() => handleCategorySelection(cat)}>
+                      <span style={{ marginRight: '6px' }}>{CATEGORY_ICONS[cat] || "📁"}</span> {cat}
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
           </div>
 
-          {/* LOWER ANALYTICS ROW BLOCKS - DYNAMIC CORRELATIONS */}
-          {selectedNode && treeData && treeData.children && treeData.children.length > 0 && (
-            <div className="bottom-analytics-deck">
-              <div className="correlation-card-wrapper">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#fff', fontFamily: 'var(--fd)' }}>Root Cause Correlations</h3>
-                  <p style={{ fontSize: '11px', color: '#5a7499' }}>Shows how different root causes impact each other and their cascading effects</p>
+          <div className="rca-sidebar-flex-stack" ref={dropdownSubRef}>
+            <div className="flbl" style={{ marginBottom: '6px', fontSize: '11px', color: '#5a7499', fontWeight: '600' }}>ANOMALY MONITORING ENGINE EXCEPTIONS</div>
+            <div className="rca-dropdown-wrapper">
+              <div className="rca-dropdown-trigger" onClick={() => setIsSubOpen(!isSubOpen)}>
+                <span style={{ color: currentException ? '#e2eaf6' : '#5a7499' }}>
+                  {currentException || "-- Choose Target Exception Module --"}
+                </span>
+                <svg className={`trigger-chevron ${isSubOpen ? 'open' : ''}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+              {isSubOpen && (
+                <ul className="rca-dropdown-overlay-list">
+                  {filteredSubCategories.length === 0 ? (
+                    <li className="rca-dropdown-row-item" style={{ color: '#5a7499', cursor: 'default' }}>No exceptions found</li>
+                  ) : (
+                    filteredSubCategories.map((sub, idx) => (
+                      <li key={idx} className={`rca-dropdown-row-item ${currentException === sub.name ? 'active' : ''}`} onClick={() => { setIsSubOpen(false); navigate(`/rca/${encodeURIComponent(sub.name)}`); }}>
+                        <span style={{ color: '#ff4d6a', marginRight: '6px' }}>⊚</span> {sub.name}
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {error && <div className="err" style={{ flexShrink: 0 }}>{error}</div>}
+
+        {!currentException ? (
+          <div className="loading ca" style={{ flexGrow: 1, border: '1px dashed var(--bdr2)', borderRadius: 'var(--rl)' }}>
+            <div style={{ fontSize: '40px', opacity: 0.5 }}>🔍</div>
+            <div className="ltxt" style={{ marginTop: '12px', color: '#5a7499' }}>Choose an exception from the dropdown above to view its root cause tree</div>
+          </div>
+        ) : loading ? (
+          <div className="loading ca" style={{ flexGrow: 1 }}><div className="spin"></div></div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="rca-dashboard-split-grid">
+              <div 
+                ref={canvasRef}
+                id="canvas-container" 
+                className="rca-tree-canvas" 
+                onMouseDown={handleMouseDown} 
+                onMouseMove={handleMouseMove} 
+                onMouseUp={handleMouseUp} 
+                onMouseLeave={handleMouseUp}
+              >
+                <div className="zoom-control-panel">
+                  <button className="zoom-btn" onClick={() => setZoomScale(s => Math.min(1.5, s + 0.1))}>＋</button>
+                  <button className="zoom-btn" onClick={() => setZoomScale(s => Math.max(0.3, s - 0.1))}>－</button>
+                  <button className="zoom-btn" onClick={() => { setZoomScale(0.7); setPanOffset({ x: 20, y: 30 }); }} style={{fontSize: '10px'}}>⟳</button>
                 </div>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
-                  {correlations.map((item, index) => {
-                    const letter = String.fromCharCode(65 + index); // A, B, C, D...
-                    return (
-                      <div key={index} className="correlation-item-row">
-                        <div className="correlation-item-left">
-                          <div className="status-indicator-dot" style={{ 
-                            background: item.color.bg, 
-                            boxShadow: `0 0 10px ${item.color.shadow}` 
-                          }}>
-                            {letter}
+                <svg ref={svgRef} style={{ width: '100%', height: '100%', display: 'block', pointerEvents: 'all' }}></svg>
+              </div>
+
+              <div className="rca-sidebar-flex-stack">
+                {selectedNode && (
+                  <div className="rca-details ca" style={{ background: 'var(--card)', border: '1px solid var(--bdr)', borderRadius: 'var(--rl)', padding: '24px', height: '100%', overflowY: 'auto' }}>
+                    <div style={{ fontSize: '12px', color: '#5a7499', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Node Details</div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px', marginBottom: '4px' }}>
+                      <h2 style={{ fontSize: '20px', color: '#fff', fontWeight: '800', fontFamily: 'var(--fd)' }}>
+                        {selectedNode.name.length > 20 ? selectedNode.name.substring(0, 18) + '...' : selectedNode.name}
+                      </h2>
+                      <div className="ai-badge">AI Analyzed</div>
+                    </div>
+
+                    <span className={`type-chip ${selectedNode.level === 0 ? 'exception' : selectedNode.level === 1 ? 'root-cause' : 'sub-cause'}`}>
+                      {selectedNode.level === 0 ? "Exception" : selectedNode.level === 1 ? "Root Cause" : "Sub Cause"}
+                    </span>
+
+                    {selectedNode.description && (
+                      <div style={{ marginTop: '12px', fontSize: '12px', color: '#a2b4dc', background: 'rgba(0,212,170,0.05)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(0,212,170,0.1)' }}>
+                        {selectedNode.description}
+                      </div>
+                    )}
+
+                    <div style={{ marginTop: '24px' }}>
+                      <div className="premium-metric-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '13px', color: '#a2b4dc', fontWeight: '500' }}>AI Confidence Score</span>
+                          <span className="num" style={{ fontSize: '16px', color: '#fff', fontWeight: '700' }}>
+                            {selectedNode.count > 0 ? (75 + (selectedNode.pct * 0.2)).toFixed(0) : '95'}%
+                          </span>
+                        </div>
+                        <div className="metric-progress-container">
+                          <div className="metric-progress-bar purple" style={{ width: `${selectedNode.count > 0 ? Math.min(100, 75 + (selectedNode.pct * 0.2)) : 95}%` }}></div>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#5a7499', marginTop: '8px' }}>High Confidence Matching Profile</div>
+                      </div>
+
+                      <div className="premium-metric-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '13px', color: '#a2b4dc', fontWeight: '500' }}>Impact Assessment</span>
+                          <span className="num" style={{ fontSize: '16px', color: '#fff', fontWeight: '700' }}>
+                            {selectedNode.count > 0 ? Math.round(selectedNode.pct) : 100}%
+                          </span>
+                        </div>
+                        <div className="metric-progress-container">
+                          <div className="metric-progress-bar orange" style={{ width: `${selectedNode.count > 0 ? Math.min(100, selectedNode.pct) : 100}%` }}></div>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#5a7499', marginTop: '8px' }}>
+                          {selectedNode.count > 0 ? (selectedNode.pct > 40 ? "Critical System Discrepancy" : "Moderate Operational Deviation") : "Critical System Discrepancy"}
+                        </div>
+                      </div>
+
+                      <div className="premium-metric-card" style={{ background: 'rgba(16, 224, 138, 0.03)', borderColor: 'rgba(16, 224, 138, 0.15)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '13px', color: '#10e08a', fontWeight: '600' }}>Financial Impact</span>
+                          <span className="num" style={{ fontSize: '18px', color: '#10e08a', fontWeight: '800' }}>
+                            ₹{Math.round(selectedNode.value || 0).toLocaleString()}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#5a7499', marginTop: '8px' }}>Total exception value affected by this node trail segment.</div>
+                      </div>
+
+                      <div className="premium-metric-card">
+                        <div style={{ fontSize: '11px', color: '#5a7499', textTransform: 'uppercase', marginBottom: '10px' }}>Node Information</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: '#5a7499' }}>Node ID:</span>
+                            <span className="num" style={{ color: '#fff', fontWeight: '600' }}>{selectedNode.id || 'root'}</span>
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <span style={{ fontSize: '13px', fontWeight: '700', color: '#fff' }}>{item.name}</span>
-                            <span style={{ fontSize: '11px', color: '#5a7499' }}>
-                              Correlation: <span style={{color:'#00d4aa', fontWeight:'600'}}>{item.correlation}%</span> 
-                              | Impact Weight Factor: <span style={{color:'#ffb830', fontWeight:'600'}}>{item.impactWeight}%</span>
-                              | Records: <span style={{color:'#e2eaf6', fontWeight:'600'}}>{item.count}</span>
-                            </span>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: '#5a7499' }}>System Level:</span>
+                            <span style={{ color: '#fff', fontWeight: '600' }}>L-{selectedNode.level || 0} Structural Branch</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: '#5a7499' }}>Total Records:</span>
+                            <span className="num" style={{ color: '#fff', fontWeight: '600' }}>{selectedNode.count?.toLocaleString() || 0}</span>
                           </div>
                         </div>
-                        <span style={{ fontSize: '11px', fontWeight: '700', color: item.color.bg, textTransform: 'uppercase' }}>
-                          {item.color.label}
-                        </span>
                       </div>
-                    );
-                  })}
-                </div>
 
-                <div style={{ display: 'flex', gap: '20px', fontSize: '11px', color: '#5a7499', marginTop: '6px', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '10px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color:'#ff4d6a' }}>●</span> High Correlation (&gt;70%)</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color:'#ffb830' }}>●</span> Medium Correlation (40-70%)</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color:'#3b9eff' }}>●</span> Low Correlation (&lt;40%)</div>
-                </div>
-              </div>
+                      <div className="premium-metric-card" style={{ background: 'rgba(0, 212, 170, 0.02)', borderColor: 'rgba(0, 212, 170, 0.12)' }}>
+                        <div style={{ fontSize: '12px', color: '#00d4aa', fontWeight: '600', marginBottom: '6px' }}>AI Analysis Summary</div>
+                        <p style={{ fontSize: '12px', color: '#a2b4dc', lineHeight: '1.5' }}>
+                          This node segment has been processed across machine learning categorization vectors. The metric exposure values represent total calculated variance frequencies inside your ERP cluster.
+                        </p>
+                      </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ fontSize: '12px', color: '#5a7499', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Impact Summary</div>
-                <div className="impact-summary-grid">
-                  <div className="summary-metric-box" style={{ background: 'rgba(255, 77, 106, 0.03)', borderColor: 'rgba(255, 77, 106, 0.12)' }}>
-                    <span style={{ fontSize: '12px', color: '#5a7499' }}>Total Root Causes</span>
-                    <span className="num" style={{ fontSize: '24px', fontWeight: '800', color: '#ff4d6a' }}>{treeData?.children?.length || 0}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--card2)', padding: '14px', borderRadius: '10px', marginTop: '16px', border: '1px solid var(--bdr)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', maxWidth: '55%' }}>
+                          <span style={{ fontSize: '12px', color: '#fff', fontWeight: '600' }}>Affected Transactions</span>
+                          <span style={{ fontSize: '10px', color: '#5a7499' }}>Review complete transaction logs</span>
+                        </div>
+                        <button className="view-tx-btn-premium" onClick={handleViewTransactions}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                          View Transactions
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="summary-metric-box" style={{ background: 'rgba(255, 184, 48, 0.03)', borderColor: 'rgba(255, 184, 48, 0.12)' }}>
-                    <span style={{ fontSize: '12px', color: '#5a7499' }}>Total Sub-Causes</span>
-                    <span className="num" style={{ fontSize: '24px', fontWeight: '800', color: '#ffb830' }}>
-                      {treeData?.children?.reduce((acc, p) => acc + (p.children?.length || 0), 0) || 0}
-                    </span>
-                  </div>
-                  <div className="summary-metric-box" style={{ background: 'rgba(16, 224, 138, 0.03)', borderColor: 'rgba(16, 224, 138, 0.12)' }}>
-                    <span style={{ fontSize: '12px', color: '#5a7499' }}>Average Impact Weight</span>
-                    <span className="num" style={{ fontSize: '24px', fontWeight: '800', color: '#10e08a' }}>
-                      {selectedNode.count > 0 ? Math.round(selectedNode.pct) : 100}%
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ fontSize: '12px', color: '#5a7499', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>AI Insights</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div className="ai-insight-strip">
-                    <span style={{ color: '#00d4aa' }}>✦</span> Over <span style={{color: '#fff', fontWeight: '600'}}>78%</span> of matching anomalies are consolidated within high-frequency transaction value buckets.
-                  </div>
-                  <div className="ai-insight-strip">
-                    <span style={{ color: '#00d4aa' }}>✦</span> Organizational branch components indicate a 2.4x variance spikes compared to the historical compliance baseline records.
-                  </div>
-                </div>
+                )}
               </div>
             </div>
-          )}
-        </div>
-      )}
 
-      {/* FIXED MODAL - NO OVERLAP */}
+            {/* LOWER ANALYTICS ROW BLOCKS - DYNAMIC CORRELATIONS */}
+            {selectedNode && treeData && treeData.children && treeData.children.length > 0 && (
+              <div className="bottom-analytics-deck">
+                <div className="correlation-card-wrapper">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#fff', fontFamily: 'var(--fd)' }}>Root Cause Correlations</h3>
+                    <p style={{ fontSize: '11px', color: '#5a7499' }}>Shows how different root causes impact each other and their cascading effects</p>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
+                    {correlations.map((item, index) => {
+                      const letter = String.fromCharCode(65 + index);
+                      return (
+                        <div key={index} className="correlation-item-row">
+                          <div className="correlation-item-left">
+                            <div className="status-indicator-dot" style={{ 
+                              background: item.color.bg, 
+                              boxShadow: `0 0 10px ${item.color.shadow}` 
+                            }}>
+                              {letter}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <span style={{ fontSize: '13px', fontWeight: '700', color: '#fff' }}>{item.name}</span>
+                              <span style={{ fontSize: '11px', color: '#5a7499' }}>
+                                Correlation: <span style={{color:'#00d4aa', fontWeight:'600'}}>{item.correlation}%</span> 
+                                | Impact Weight Factor: <span style={{color:'#ffb830', fontWeight:'600'}}>{item.impactWeight}%</span>
+                                | Records: <span style={{color:'#e2eaf6', fontWeight:'600'}}>{item.count}</span>
+                              </span>
+                            </div>
+                          </div>
+                          <span style={{ fontSize: '11px', fontWeight: '700', color: item.color.bg, textTransform: 'uppercase' }}>
+                            {item.color.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '20px', fontSize: '11px', color: '#5a7499', marginTop: '6px', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color:'#ff4d6a' }}>●</span> High Correlation (&gt;70%)</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color:'#ffb830' }}>●</span> Medium Correlation (40-70%)</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ color:'#3b9eff' }}>●</span> Low Correlation (&lt;40%)</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ fontSize: '12px', color: '#5a7499', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Impact Summary</div>
+                  <div className="impact-summary-grid">
+                    <div className="summary-metric-box" style={{ background: 'rgba(255, 77, 106, 0.03)', borderColor: 'rgba(255, 77, 106, 0.12)' }}>
+                      <span style={{ fontSize: '12px', color: '#5a7499' }}>Total Root Causes</span>
+                      <span className="num" style={{ fontSize: '24px', fontWeight: '800', color: '#ff4d6a' }}>{treeData?.children?.length || 0}</span>
+                    </div>
+                    <div className="summary-metric-box" style={{ background: 'rgba(255, 184, 48, 0.03)', borderColor: 'rgba(255, 184, 48, 0.12)' }}>
+                      <span style={{ fontSize: '12px', color: '#5a7499' }}>Total Sub-Causes</span>
+                      <span className="num" style={{ fontSize: '24px', fontWeight: '800', color: '#ffb830' }}>
+                        {treeData?.children?.reduce((acc, p) => acc + (p.children?.length || 0), 0) || 0}
+                      </span>
+                    </div>
+                    <div className="summary-metric-box" style={{ background: 'rgba(16, 224, 138, 0.03)', borderColor: 'rgba(16, 224, 138, 0.12)' }}>
+                      <span style={{ fontSize: '12px', color: '#5a7499' }}>Average Impact Weight</span>
+                      <span className="num" style={{ fontSize: '24px', fontWeight: '800', color: '#10e08a' }}>
+                        {selectedNode.count > 0 ? Math.round(selectedNode.pct) : 100}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ fontSize: '12px', color: '#5a7499', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>AI Insights</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className="ai-insight-strip">
+                      <span style={{ color: '#00d4aa' }}>✦</span> Over <span style={{color: '#fff', fontWeight: '600'}}>78%</span> of matching anomalies are consolidated within high-frequency transaction value buckets.
+                    </div>
+                    <div className="ai-insight-strip">
+                      <span style={{ color: '#00d4aa' }}>✦</span> Organizational branch components indicate a 2.4x variance spikes compared to the historical compliance baseline records.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* MODAL - Always on top with its own header */}
       {modalOpen && (
         <div className="tx-modal-overlay" onClick={(e) => {
           if (e.target === e.currentTarget) setModalOpen(false);
         }}>
           <div className="tx-modal-container">
-            
+            {/* Modal Header - Always visible at top */}
             <div className="tx-modal-header">
-              <div>
-                <h2 className="tx-modal-title">Transactions for {selectedNode?.name}</h2>
+              <div className="tx-modal-header-left">
+                <div className="tx-modal-title">📋 Transactions for {selectedNode?.name || currentException}</div>
                 <div className="tx-modal-subtitle">{Array.isArray(transactions) ? transactions.length : 0} transactions located inside repository logs</div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <div className="tx-modal-header-right">
                 <button 
                   className="tx-download-btn" 
                   onClick={() => {
-                    const url = `http://127.0.0.1:5001/rca/transactions/${encodeURIComponent(currentException)}?download=true`;
+                    let url = `http://127.0.0.1:5001/rca/transactions/${encodeURIComponent(currentException)}?download=true`;
+                    const params = new URLSearchParams();
+                    if (selectedNode.level === 1) {
+                      params.append('category', selectedNode.name);
+                    } else if (selectedNode.level === 2) {
+                      params.append('category', selectedNode.parentName);
+                      params.append('sub_category', selectedNode.name);
+                    }
+                    const queryString = params.toString();
+                    if (queryString) {
+                      url += `&${queryString}`;
+                    }
                     window.open(url, '_blank');
                   }}
                 >
-                  <svg width="16" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{marginTop:'1px'}}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4m4-10 5 5 5-5m-5-3v12"/></svg>
+                  <svg width="14" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4m4-10 5 5 5-5m-5-3v12"/></svg>
                   Download CSV
                 </button>
                 <button className="tx-dismiss-x" onClick={() => setModalOpen(false)}>✕</button>
               </div>
             </div>
 
-            <div className="tx-table-wrapper" style={{ 
-  overflow: 'auto', 
-  flex: 1,
-  position: 'relative'
-}}>
+            {/* Table Wrapper - Scrollable */}
+            <div className="tx-table-wrapper">
               {loadingTx ? (
                 <div className="loading" style={{minHeight:'250px'}}><div className="spin" style={{borderTopColor:'#475569'}}></div></div>
               ) : txError ? (
-                <div className="err" style={{margin:'20px 0'}}>{txError}</div>
+                <div className="err" style={{margin:'20px'}}>{txError}</div>
               ) : !Array.isArray(transactions) || transactions.length === 0 ? (
-                <div style={{ padding: '60px 0', textAlign: 'center', color: '#5a7499', fontSize: '15px' }}>No document record items found for this localized operational node tree slice.</div>
+                <div style={{ padding: '60px 20px', textAlign: 'center', color: '#5a7499', fontSize: '15px' }}>No document record items found for this localized operational node tree slice.</div>
               ) : (
                 <table className="tx-native-table">
                   <thead>
                     <tr>
-                      {Object.keys(transactions[0]).filter(k => k !== 'Comment').map(key => (
-                        <th key={key}>{key.replace(/_/g, ' ')}</th>
-                      ))}
-                     <th style={{ 
-  backgroundColor: 'rgba(18, 12, 36, 0.81)', 
-  color: '#10e08a',
-  minWidth: '200px',
-  maxWidth: '300px'
-}}>
-  AUDIT COMMENT
-</th>
+                      {Object.keys(transactions[0]).map(key => {
+                        // Map column names to display names
+                        let displayName = key.replace(/_/g, ' ');
+                        if (key === 'Comment' || key === 'comment') {
+                          displayName = 'AUDIT COMMENT';
+                        } else if (displayName.toLowerCase().includes('amount')) {
+                          displayName = 'AMOUNT';
+                        } else if (displayName.toLowerCase().includes('category')) {
+                          displayName = 'CATEGORY';
+                        } else if (displayName.toLowerCase().includes('date')) {
+                          displayName = 'DATE';
+                        } else if (displayName.toLowerCase().includes('document') || displayName.toLowerCase().includes('doc')) {
+                          displayName = 'DOCUMENT NUMBER';
+                        } else if (displayName.toLowerCase().includes('status')) {
+                          displayName = 'STATUS';
+                        } else if (displayName.toLowerCase().includes('sub')) {
+                          displayName = 'SUB-CATEGORY';
+                        } else if (displayName.toLowerCase().includes('vendor') || displayName.toLowerCase().includes('customer')) {
+                          displayName = 'VENDOR/CUSTOMER';
+                        } else if (displayName.toLowerCase().includes('transaction') || displayName.toLowerCase().includes('txn')) {
+                          displayName = 'TRANSACTION ID';
+                        } else {
+                          displayName = displayName.toUpperCase();
+                        }
+                        
+                        const isComment = key === 'Comment' || key === 'comment';
+                        return (
+                          <th 
+                            key={key} 
+                            className={getColumnClass(key)}
+                            style={isComment ? {
+                              backgroundColor: '#0c1221', 
+                              color: '#10e08a',
+                              minWidth: '250px'
+                            } : {}}
+                          >
+                            {displayName}
+                          </th>
+                        );
+                      })}
                     </tr>
                   </thead>
                   <tbody>
-                    {transactions.map((tx, idx) => (
-                      <tr key={idx}>
-                        {Object.entries(tx).filter(([colName]) => colName !== 'Comment').map(([colName, val], vIdx) => {
-                          const isFirstCell = vIdx === 0;
-                          const isAmount = colName.toLowerCase().includes('amount') || colName.toLowerCase().includes('value') || colName.toLowerCase().includes('diff') || colName.toLowerCase().includes('price');
-                          const isStatus = colName.toLowerCase().includes('status') || colName.toLowerCase().includes('indicator');
+                    {transactions.map((tx, idx) => {
+                      const txId = tx.transaction_id || tx.id || `row-${idx}`;
+                      const isEditing = editingComment === txId;
+                      const comment = tx.Comment || tx.comment || '';
+                      
+                      return (
+                        <tr key={idx}>
+                          {Object.entries(tx).map(([colName, val], vIdx) => {
+                            const isFirstCell = vIdx === 0;
+                            const isAmount = colName.toLowerCase().includes('amount') || colName.toLowerCase().includes('value') || colName.toLowerCase().includes('diff') || colName.toLowerCase().includes('price');
+                            const isStatus = colName.toLowerCase().includes('status') || colName.toLowerCase().includes('indicator');
+                            const isComment = colName === 'Comment' || colName === 'comment';
 
-                          let cellContent = val !== null && val !== undefined ? String(val) : '-';
-                          if (isAmount && val && !String(val).includes('₹')) {
-                            const numVal = parseFloat(String(val).replace(/,/g, ''));
-                            if (!isNaN(numVal)) {
-                              cellContent = `₹${numVal.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+                            if (isComment) {
+                              return (
+                                <td key={colName} className="tx-cell-comment">
+                                  <div className="comment-edit-wrapper">
+                                    {isEditing ? (
+                                      <>
+                                        <input
+                                          className="comment-input"
+                                          type="text"
+                                          value={commentText}
+                                          onChange={(e) => setCommentText(e.target.value)}
+                                          placeholder="Enter comment..."
+                                          autoFocus
+                                        />
+                                        <button 
+                                          className="comment-save-btn"
+                                          onClick={() => handleSaveComment(txId, commentText)}
+                                          disabled={savingComment}
+                                        >
+                                          {savingComment ? '...' : 'Save'}
+                                        </button>
+                                        <button 
+                                          className="comment-cancel-btn"
+                                          onClick={() => {
+                                            setEditingComment(null);
+                                            setCommentText('');
+                                          }}
+                                        >
+                                          Cancel
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <span 
+                                        className="comment-text"
+                                        onClick={() => {
+                                          setEditingComment(txId);
+                                          setCommentText(comment);
+                                        }}
+                                        title={comment || "Click to add comment"}
+                                      >
+                                        {comment || "Click to add comment"}
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                              );
                             }
-                          }
 
-                          return (
-                            <td key={vIdx} className={isFirstCell ? "tx-cell-bold" : ""}>
-                              {isStatus ? (
-                                <span className="tx-pill-status">{cellContent}</span>
-                              ) : (
-                                <>
-                                  <div>{cellContent}</div>
-                                  {isFirstCell && <span className="tx-cell-subtext">DOCUMENT INDEX LINE</span>}
-                                </>
-                              )}
-                            </td>
-                          );
-                        })}
-                        <td className="tx-cell-comment" title={tx.Comment} style={{ 
-  maxWidth: '300px', 
-  whiteSpace: 'normal', 
-  wordBreak: 'break-word',
-  minWidth: '200px'
-}}>
-  {tx.Comment || "-"}
-</td>
-                      </tr>
-                    ))}
+                            let cellContent = val !== null && val !== undefined ? String(val) : '-';
+                            if (isAmount && val && !String(val).includes('₹')) {
+                              const numVal = parseFloat(String(val).replace(/,/g, ''));
+                              if (!isNaN(numVal)) {
+                                cellContent = `₹${numVal.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+                              }
+                            }
+
+                            return (
+                              <td key={colName} className={isFirstCell ? "tx-cell-bold" : ""}>
+                                {isStatus ? (
+                                  <span className="tx-pill-status">{cellContent}</span>
+                                ) : (
+                                  <>
+                                    <div>{cellContent}</div>
+                                    {isFirstCell && <span className="tx-cell-subtext">DOCUMENT INDEX LINE</span>}
+                                  </>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}
             </div>
 
+            {/* Modal Footer */}
             <div className="tx-modal-footer">
               <div className="tx-footer-count">Showing {Array.isArray(transactions) ? transactions.length : 0} ledger items rows</div>
               <button className="tx-footer-close-btn" onClick={() => setModalOpen(false)}>Close</button>
             </div>
-
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

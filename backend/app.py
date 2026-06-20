@@ -13,6 +13,7 @@ import json
 import csv
 import random
 import traceback
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -30,7 +31,8 @@ AUDIT_RISK_MAP = {
         "category": "Procure to Pay",
         "description": "Purchase Orders raised with reference to a contract but at a price exceeding the contracted price, leading to financial loss and potential fraud.",
         "table_candidates": ["procurement_higher_contract"],
-        "value_candidates": ["PriceDiff", "pricediff", "price_diff", "FinalImpact"],
+        "value_candidates": ["FinalImpact", "PriceDiff", "pricediff", "price_diff"],
+        "description_field": "description",
         "cats": [
             {"name": "Market & Vendor Constraints", "sub1": "Vendor Price Hike", "sub2": "Spot Buy Prevents Shutdown"},
             {"name": "Master Data & Process Lag", "sub1": "Pending Rate Update", "sub2": "Delayed Contract Doc"},
@@ -40,8 +42,9 @@ AUDIT_RISK_MAP = {
     "Unplanned Delivery Cost > 5%": {
         "category": "Procure to Pay",
         "description": "Invoices paid in excess of the approved PO value through use of 'unplanned delivery cost' feature or manual surcharges, leading to financial loss.",
-        "table_candidates": [ "sjin13_unplanned_delivery"],
+        "table_candidates": ["sjin13_unplanned_delivery"],
         "value_candidates": ["Unplanned Delivery Cost", "unplanned_delivery_cost", "DeliveryCost_Local", "delivery_costs"],
+        "description_field": "description",
         "cats": [
             {"name": "Logistics & Operational Reality", "sub1": "Expedited Shipping", "sub2": "Unforeseen Port Charges"},
             {"name": "System & Workflow Configuration", "sub1": "Supply Chain Tolerance", "sub2": "Missing Excess Workflow"},
@@ -53,6 +56,7 @@ AUDIT_RISK_MAP = {
         "description": "Delayed payment to MSME vendors resulting in non-compliance to MSME Act, 2006.",
         "table_candidates": ["sjpa7_msme_penalty"],
         "value_candidates": ["INTEREST_ON_DELAYED_PAYMENT_TO_MSME_(@3 TIMES THE BANK RATE)", "AMOUNT", "amount", "interest_on_delayed_payment_to_msme_"],
+        "description_field": "description",
         "cats": [
             {"name": "Cash Flow & Prioritization", "sub1": "Cash Flow Constraints", "sub2": "Critical Vendor Priority"},
             {"name": "Master Data & Documentation", "sub1": "Missing MSME Flag", "sub2": "Late MSME Cert"},
@@ -63,7 +67,8 @@ AUDIT_RISK_MAP = {
         "category": "Procure to Pay",
         "description": "PO terms amended after goods received, enabling retroactive fraud.",
         "table_candidates": ["po_terms_changed"],
-        "value_candidates": ["Net value", "Net Value", "net_value"],
+        "value_candidates": ["Difference", "Net value", "Net Value", "net_value", "Amount", "Net Order Value", "Amt.in Loc.Cur."],
+        "description_field": "description",
         "cats": [
             {"name": "Invoice & Tax Alignment", "sub1": "Invoice Tax Sync", "sub2": "Delivered Qty Sync"},
             {"name": "Commercial Adjustments", "sub1": "Post-Delivery Discount", "sub2": "Late Freight Finalization"},
@@ -75,6 +80,7 @@ AUDIT_RISK_MAP = {
         "description": "Purchase Orders deliberately split below approval thresholds to circumvent Delegation of Authority, enabling unauthorised procurement.",
         "table_candidates": ["po_split"],
         "value_candidates": ["Net Order Value", "Net value", "Net Value", "net_value"],
+        "description_field": "description",
         "cats": [
             {"name": "Budget & Phasing Realities", "sub1": "Phased Budget Release", "sub2": "Urgent Scope Expansion"},
             {"name": "Approval & Lead Time Bottlenecks", "sub1": "Local Approval Routing", "sub2": "Urgent Sign-off Bypass"},
@@ -86,6 +92,7 @@ AUDIT_RISK_MAP = {
         "description": "Vendor bank account changed to a fraudulent account for payment then reinstated to original account after payment, concealing the fraud.",
         "table_candidates": ["bank_account_changed"],
         "value_candidates": ["Amount", "amount"],
+        "description_field": "description",
         "cats": [
             {"name": "Vendor Banking Issues", "sub1": "Vendor Account Maintenance", "sub2": "Subsidiary Routing Request"},
             {"name": "Master Data & Turnaround Urgency", "sub1": "Urgent Checker Bypass", "sub2": "Verbal Vendor Confirmation"},
@@ -97,6 +104,7 @@ AUDIT_RISK_MAP = {
         "description": "Sales return quantities at batch/customer level exceed the original sales quantity, indicating fraudulent returns or revenue manipulation.",
         "table_candidates": ["cjsa23_sales_return_qty"],
         "value_candidates": ["Difference (Sales - Sales Return)", "Sales Return Quantity (Sum)", "target_quantity"],
+        "description_field": "description",
         "cats": [
             {"name": "Customer Dispute Resolution", "sub1": "Consolidated Past Returns", "sub2": "Strategic Client Goodwill"},
             {"name": "Documentation & Sync Gaps", "sub1": "Pending Return GR", "sub2": "Verbal Sales Auth"},
@@ -108,6 +116,7 @@ AUDIT_RISK_MAP = {
         "description": "Sales returns credited at price greater than original sales price, inflating credit notes and reducing revenue.",
         "table_candidates": ["sales_return_price_mismatch"],
         "value_candidates": ["Price Mismatch", "Net Value", "Net value", "net_value"],
+        "description_field": "description",
         "cats": [
             {"name": "Commercial Compensation", "sub1": "Customer Penalty Comp", "sub2": "Market Rate Settlement"},
             {"name": "Process Exigencies", "sub1": "Expedited Refund Entry", "sub2": "Spanning Price Credit"},
@@ -119,6 +128,7 @@ AUDIT_RISK_MAP = {
         "description": "Multiple sales returns raised against the same original invoice or customer within a short time window indicate potential return fraud, manipulation of sales volumes, or exploitation of the returns process.",
         "table_candidates": ["multiple_sales_return"],
         "value_candidates": ["Net Value", "Net value", "net_value"],
+        "description_field": "description",
         "cats": [
             {"name": "Product & Transit Issues", "sub1": "Staggered Damage Returns", "sub2": "Phased Batch Recall"},
             {"name": "Customer Behavior Constraints", "sub1": "Small Batch Returns", "sub2": "Customer Space Limits"},
@@ -130,6 +140,7 @@ AUDIT_RISK_MAP = {
         "description": "Sales returns processed immediately (same day or within 1–3 days of the original invoice date) indicate potential circular transactions, goods never actually dispatched, or collusion between sales and warehouse teams.",
         "table_candidates": ["sales_return_im"],
         "value_candidates": ["Net Value", "Net value", "Amount in LC", "amount_in_lc"],
+        "description_field": "description",
         "cats": [
             {"name": "Logistics & Dispatch Corrections", "sub1": "Wrong Dispatch Reversal", "sub2": "In-Transit Cancellation"},
             {"name": "Customer Service Speed", "sub1": "Quick Billing Correction", "sub2": "Rapid Service Policy"},
@@ -140,7 +151,8 @@ AUDIT_RISK_MAP = {
         "category": "Order to Cash",
         "description": "Sales returns raised more than 180 days after the original invoice date expose the company to inflated credit note exposure, acceptance of fully depreciated or expired goods, fictitious reversal of old revenue, and non-compliance with contractual return windows.",
         "table_candidates": ["sales_return_180"],
-        "value_candidates": ["Diff Latest Sale And Return", "Forward Return", "Net value", "Net Value"],
+        "value_candidates": ["Net value", "Net Value", "net_value", "Diff Latest Sale And Return", "Forward Return"],
+        "description_field": "description",
         "cats": [
             {"name": "Commercial Relationship Management", "sub1": "Key Distributor Exception", "sub2": "Partner Liquidity Support"},
             {"name": "Product Lifecycle Realities", "sub1": "Expired Goods Practice", "sub2": "Extended Warranty Claim"},
@@ -152,6 +164,7 @@ AUDIT_RISK_MAP = {
         "description": "Duplicate Customers in the system leading to data inconsistencies and potential fraud.",
         "table_candidates": ["duplicate_customers"],
         "value_candidates": ["sum_of_all_transactions", "no_of_duplicates"],
+        "description_field": "description",
         "cats": [
             {"name": "Organizational & Legacy Data", "sub1": "Cross-Vertical Customer", "sub2": "Legacy System Migration"},
             {"name": "Master Data & Turnaround Urgency", "sub1": "Urgent Creation Bypass", "sub2": "No Data Cleansing"},
@@ -163,6 +176,7 @@ AUDIT_RISK_MAP = {
         "description": "Goods sold at zero or nominal value without proper authorisation lead to revenue loss and potential collusion with customers.",
         "table_candidates": ["cjsa22_foc_discount"],
         "value_candidates": ["Net Value", "Net value", "Billed Quantity"],
+        "description_field": "description",
         "cats": [
             {"name": "Marketing & Sales Promos", "sub1": "Competitor Match FOC", "sub2": "Product Launch Samples"},
             {"name": "Inventory Management Needs", "sub1": "Expiry Liquidation", "sub2": "Damage Write-Off"},
@@ -173,7 +187,8 @@ AUDIT_RISK_MAP = {
         "category": "Scrap Management",
         "description": "Scrap Sales without proper authorization or valuation leading to revenue leakage.",
         "table_candidates": ["scrap_sales"],
-        "value_candidates": ["Net Value", "Net value", "Impact"],
+        "value_candidates": ["Impact", "impact", "Net Value", "Net value", "net_value"],
+        "description_field": "description",
         "cats": [
             {"name": "Operational Urgency", "sub1": "Yard Clearance Priority", "sub2": "No Time for Quotes"},
             {"name": "Material Classification Issues", "sub1": "Off-Spec Downgrade", "sub2": "Estimated Weight"},
@@ -183,8 +198,9 @@ AUDIT_RISK_MAP = {
     "Actual vs Standard Yield Loss Risk": {
         "category": "Inventory Management",
         "description": "Actual yield losses in manufacturing significantly deviate from standard yield losses defined in the BOM/routing without investigation, leading to undetected material wastage or diversion.",
-        "table_candidates": ["mjt06_yield_loss"],
-        "value_candidates": ["Standard_Yield_Loss", "Actual yield (confirmed)", "yield_variance"],
+        "table_candidates": ["mjot06_yield_loss", "mjt06_yield_loss"],
+        "value_candidates": ["Standard_Yield_Loss", "Actual yield (confirmed)", "yield_variance", "actual_yield_confirmed", "standard_yield_loss"],
+        "description_field": "description",
         "cats": [
             {"name": "Production & Material Realities", "sub1": "Variable RM Quality", "sub2": "Aging Machine Efficiency"},
             {"name": "Master Data Lag", "sub1": "Outdated BOM Yield", "sub2": "Delayed Routing Update"},
@@ -196,6 +212,7 @@ AUDIT_RISK_MAP = {
         "description": "Procurement occurs for materials where existing inventory already exceeds reorder level, leading to excess stock and high carrying costs.",
         "table_candidates": ["reorder_level"],
         "value_candidates": ["Available Quantity", "Stock as on PO date", "value_unrestricted"],
+        "description_field": "description",
         "cats": [
             {"name": "Supply Chain Strategy", "sub1": "Strategic Bulk Buy", "sub2": "Shortage Hedging"},
             {"name": "Planning & MRP Lags", "sub1": "Stale MRP Signals", "sub2": "Outdated Safety Stock"},
@@ -207,6 +224,7 @@ AUDIT_RISK_MAP = {
         "description": "Finished goods are dispatched without adequate final quality inspection, leading to customer complaints and returns.",
         "table_candidates": ["finished_goods_dispatched_wo_qi"],
         "value_candidates": ["Amount in LC", "amount_in_lc"],
+        "description_field": "description",
         "cats": [
             {"name": "Commercial & Delivery Urgency", "sub1": "Urgent Dispatch Bypass", "sub2": "Month-End Revenue Release"},
             {"name": "Process & Resource Bottlenecks", "sub1": "QA Lab Down", "sub2": "Night Shift QC Shortage"},
@@ -218,6 +236,7 @@ AUDIT_RISK_MAP = {
         "description": "Expired, quality-rejected or quality-hold materials issued for production or dispatched to market, leading to product safety failures and regulatory non-compliance.",
         "table_candidates": ["cjs1_quality_rejected"],
         "value_candidates": ["Distinct_count", "Distinct count", "New_value"],
+        "description_field": "description",
         "cats": [
             {"name": "Production Urgency & Salvage", "sub1": "Salvaged Batch Use", "sub2": "Conditional Release"},
             {"name": "Process & Communication Failures", "sub1": "Missing Physical Tag", "sub2": "Stock Rotation Failure"},
@@ -229,6 +248,7 @@ AUDIT_RISK_MAP = {
         "description": "TDS deducted at rates other than the applicable statutory rate for the vendor/transaction type leading to non-compliance.",
         "table_candidates": ["tds_insight"],
         "value_candidates": ["Amount", "amount", "Amount in Loc. Curr."],
+        "description_field": "description",
         "cats": [
             {"name": "Ambiguity & Interpretation", "sub1": "Ambiguous Service Type", "sub2": "Wrong Vendor Cert"},
             {"name": "Master Data Lag", "sub1": "Outdated Vendor TDS", "sub2": "User TDS Adjustment"},
@@ -240,6 +260,7 @@ AUDIT_RISK_MAP = {
         "description": "Ineligible ITC may be claimed leading to regulatory exposure.",
         "table_candidates": ["gst_working"],
         "value_candidates": ["Diff in IGST", "diff_in_igst"],
+        "description_field": "description",
         "cats": [
             {"name": "Vendor Compliance Issues", "sub1": "Late Vendor GSTR-1", "sub2": "Retroactive Vendor Cancel"},
             {"name": "Process & Interpretation", "sub1": "Ambiguous Blocked Credit", "sub2": "Delayed 180-Day Tracking"},
@@ -250,7 +271,8 @@ AUDIT_RISK_MAP = {
         "category": "Cyber Security",
         "description": "Inadequate database security (weak passwords, excessive file permissions, insecure configuration settings) exposes the SAP database to unauthorised access and data manipulation.",
         "table_candidates": ["password_test"],
-        "value_candidates": ["Last Password Changed", "days_since_last_change"],
+        "value_candidates": ["days_since_last_change"],
+        "description_field": "description",
         "cats": [
             {"name": "Operational Needs & Legacy", "sub1": "Night Shift Broad Access", "sub2": "Legacy Profile Retention"},
             {"name": "Resource Constraints", "sub1": "No SAP Basis Team", "sub2": "Relaxed Password Policy"},
@@ -262,6 +284,7 @@ AUDIT_RISK_MAP = {
         "description": "Direct Changes to SAP without proper authorization or documentation.",
         "table_candidates": ["direct_changes_sap"],
         "value_candidates": ["Old Value", "New Value"],
+        "description_field": "description",
         "cats": [
             {"name": "Critical Incident Resolution", "sub1": "Month-End Dump Fix", "sub2": "P1 Transport Bypass"},
             {"name": "Process Exigencies", "sub1": "Emergency Config Request", "sub2": "Direct Correction Applied"},
@@ -385,7 +408,7 @@ MOCK_COMMENTS_MAP = {
 def resolve_table_and_column(cursor, config):
     """Find matching table from database"""
     try:
-        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' OR table_schema='oats';")
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = %s;", (SCHEMA_NAME,))
         db_tables = [r[0].lower().strip() for r in cursor.fetchall()]
         
         # First try exact match from candidates
@@ -407,16 +430,34 @@ def resolve_table_and_column(cursor, config):
         print(f"Error resolving table: {e}")
         return None, config["value_candidates"]
 
+def clean_col_string(s):
+    return "".join(c for c in s.lower() if c.isalnum())
+
 def get_matching_column(cursor, table_name, candidates):
     try:
-        cursor.execute('SELECT column_name FROM information_schema.columns WHERE table_name = %s;', (table_name,))
+        cursor.execute('SELECT column_name FROM information_schema.columns WHERE table_schema = %s AND table_name = %s;', (SCHEMA_NAME, table_name))
         db_cols = [r[0] for r in cursor.fetchall()]
         
+        # 1. Try alphanumeric exact match
+        for c in candidates:
+            c_clean = clean_col_string(c)
+            for db_c in db_cols:
+                if c_clean == clean_col_string(db_c):
+                    return db_c
+                    
+        # 2. Try substring match on cleaned strings
+        for c in candidates:
+            c_clean = clean_col_string(c)
+            for db_c in db_cols:
+                db_c_clean = clean_col_string(db_c)
+                if c_clean in db_c_clean or db_c_clean in c_clean:
+                    return db_c
+                    
+        # 3. Fallback to original match logic
         for c in candidates:
             for db_c in db_cols:
                 if c.lower().strip() == db_c.lower().strip():
                     return db_c
-        
         for c in candidates:
             for db_c in db_cols:
                 if c.lower().strip() in db_c.lower().strip() or db_c.lower().strip() in c.lower().strip():
@@ -436,6 +477,7 @@ def get_db_connection():
             user="neondb_owner", 
             password="npg_5wQeyoh4pxFT", 
             sslmode="require",
+            options=f"-csearch_path={SCHEMA_NAME}",
             connect_timeout=10
         )
         return conn
@@ -458,9 +500,102 @@ def get_exceptions():
         print(f"Error in get_exceptions: {e}")
         return jsonify({"error": str(e)}), 500
 
+def get_comment_for_transaction(cursor, table_name, transaction_id, id_column):
+    """Get the existing comment for a transaction from the database"""
+    try:
+        # Check if comment column exists
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_schema = %s AND table_name = %s AND (column_name = 'auditee_comment' OR column_name = 'comment')
+        """, (SCHEMA_NAME, table_name))
+        rows = cursor.fetchall()
+        cols = [r[0] for r in rows]
+        comment_col = 'auditee_comment' if 'auditee_comment' in cols else ('comment' if 'comment' in cols else None)
+        
+        if not comment_col:
+            return None
+            
+        query = f'SELECT "{comment_col}" FROM "{table_name}" WHERE "{id_column}" = %s'
+        cursor.execute(query, (transaction_id,))
+        result = cursor.fetchone()
+        return result[0] if result else None
+    except Exception as e:
+        print(f"Error getting comment: {e}")
+        return None
+
+def classify_dataframe(df, target_config):
+    """
+    Classify each row of df into (category_name, sub_category_name).
+    Returns a dict mapping row index to (category_name, sub_category_name).
+    """
+    cats = target_config["cats"]
+    desc_field = target_config.get("description_field", "description")
+    
+    # Find active desc_field
+    resolved_desc_field = None
+    if desc_field in df.columns:
+        resolved_desc_field = desc_field
+    else:
+        for col in df.columns:
+            if 'description' in col.lower() or 'desc' in col.lower() or 'remarks' in col.lower():
+                resolved_desc_field = col
+                break
+                
+    # Create flat list of all subcategories for round-robin assignment
+    flat_subs = []
+    for cat in cats:
+        flat_subs.append((cat["name"], cat["sub1"]))
+        flat_subs.append((cat["name"], cat["sub2"]))
+        
+    classifications = {}
+    for pos, idx in enumerate(df.index):
+        row = df.loc[idx]
+        description = str(row[resolved_desc_field]) if resolved_desc_field else ""
+        
+        # Check comment column
+        comment_val = ""
+        for col in df.columns:
+            if col.lower() == 'comment':
+                comment_val = str(row[col]) if pd.notna(row[col]) else ""
+                break
+                
+        search_text = (description + " " + comment_val).lower()
+        
+        assigned = False
+        # 1. Match sub-category keywords explicitly
+        for cat in cats:
+            sub1_lower = cat["sub1"].lower()
+            sub2_lower = cat["sub2"].lower()
+            
+            if sub1_lower in search_text:
+                classifications[idx] = (cat["name"], cat["sub1"])
+                assigned = True
+                break
+            elif sub2_lower in search_text:
+                classifications[idx] = (cat["name"], cat["sub2"])
+                assigned = True
+                break
+                
+        if not assigned:
+            # 2. Match category keywords
+            for cat in cats:
+                cat_name_lower = cat["name"].lower()
+                if cat_name_lower in search_text:
+                    classifications[idx] = (cat["name"], cat["sub1"])
+                    assigned = True
+                    break
+                    
+        if not assigned:
+            # 3. Deterministic round-robin distribution to prevent all unassigned going to the same category
+            classifications[idx] = flat_subs[pos % len(flat_subs)]
+            
+    return classifications
+
 @app.route('/rca/tree/<path:exception_name>', methods=['GET'])
 def get_tree_data(exception_name):
     try:
+        log_db_schema()
         if exception_name not in AUDIT_RISK_MAP: 
             return jsonify({"error": f"Exception '{exception_name}' not found"}), 404
         
@@ -474,59 +609,129 @@ def get_tree_data(exception_name):
         try:
             matched_table, val_candidates = resolve_table_and_column(cursor, target)
             
+            # Log debug info
+            import os
+            debug_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "get_tree_data_debug.log")
+            
             if not matched_table:
+                with open(debug_path, "w", encoding="utf-8") as f:
+                    f.write(f"Exception: {exception_name}\nMatched Table: None\n")
                 cursor.close()
                 conn.close()
                 return generate_mock_tree(exception_name, target)
             
-            # Get total count - use double quotes for table name
-            query = f'SELECT COUNT(*) FROM "{matched_table}"'
-            cursor.execute(query)
-            total_records = cursor.fetchone()[0]
+            # Get all data from the table
+            query = f'SELECT * FROM "{matched_table}"'
+            df = pd.read_sql_query(query, conn)
             
-            if total_records == 0:
+            if len(df) == 0:
+                with open(debug_path, "w", encoding="utf-8") as f:
+                    f.write(f"Exception: {exception_name}\nMatched Table: {matched_table}\nRow Count: 0\n")
                 cursor.close()
                 conn.close()
                 return generate_mock_tree(exception_name, target)
             
             # Get the value column for financial impact
             resolved_value_col = get_matching_column(cursor, matched_table, val_candidates)
-            global_sum = float(total_records)
             
+            # Case-insensitive resolution against df.columns
             if resolved_value_col:
-                try:
-                    query = f'SELECT SUM(CAST(NULLIF(TRIM(CAST("{resolved_value_col}" AS TEXT)), \'\') AS NUMERIC)) FROM "{matched_table}"'
-                    cursor.execute(query)
-                    fetched_val = cursor.fetchone()[0]
-                    if fetched_val is not None:
-                        global_sum = float(fetched_val)
-                except Exception as e:
-                    print(f"Error summing column: {e}")
-            
-            # Distribute records among categories
-            children_nodes = []
-            fractions = [0.45, 0.35, 0.20]
-            sub_fractions = [0.60, 0.40]
-            
-            for i, cat_def in enumerate(target["cats"]):
-                cat_weight = fractions[i % len(fractions)]
-                cat_value = global_sum * cat_weight
-                cat_count = max(1, math.floor(total_records * cat_weight))
+                matched_col_in_df = None
+                for col in df.columns:
+                    if col.lower().strip() == resolved_value_col.lower().strip():
+                        matched_col_in_df = col
+                        break
+                resolved_value_col = matched_col_in_df
                 
+            global_sum = float(len(df))
+            
+            # Try to sum the value column if it exists
+            sum_success = False
+            sum_error = ""
+            if resolved_value_col and resolved_value_col in df.columns:
+                try:
+                    def clean_val(val):
+                        if pd.isna(val) or val is None:
+                            return 0.0
+                        val_str = str(val).replace('₹', '').replace('$', '').replace(',', '').strip()
+                        try:
+                            return float(val_str)
+                        except ValueError:
+                            return 0.0
+                    df[resolved_value_col] = df[resolved_value_col].apply(clean_val)
+                    global_sum = float(df[resolved_value_col].sum())
+                    sum_success = True
+                except Exception as e:
+                    sum_error = str(e)
+                    global_sum = float(len(df))
+            
+            with open(debug_path, "w", encoding="utf-8") as f:
+                f.write(f"Exception: {exception_name}\n"
+                        f"Matched Table: {matched_table}\n"
+                        f"Val Candidates: {val_candidates}\n"
+                        f"Resolved Value Col: {resolved_value_col}\n"
+                        f"DF Columns: {list(df.columns)}\n"
+                        f"Sum Success: {sum_success}\n"
+                        f"Sum Error: {sum_error}\n"
+                        f"Global Sum: {global_sum}\n"
+                        f"Total Records: {len(df)}\n")
+            
+            # Categorize records using shared classify_dataframe helper
+            classifications = classify_dataframe(df, target)
+            
+            # Build tree structure
+            children_nodes = []
+            total_records = len(df)
+            
+            for cat in target["cats"]:
+                cat_name = cat["name"]
+                sub1_name = cat["sub1"]
+                sub2_name = cat["sub2"]
+                
+                # Get indices for sub1 and sub2 from classifications
+                sub1_records = [idx for idx, (c, s) in classifications.items() if c == cat_name and s == sub1_name]
+                sub2_records = [idx for idx, (c, s) in classifications.items() if c == cat_name and s == sub2_name]
+                
+                # Calculate values for sub1
+                sub1_value = 0.0
+                if sub1_records and resolved_value_col and resolved_value_col in df.columns:
+                    sub1_value = float(df.loc[sub1_records][resolved_value_col].sum())
+                else:
+                    sub1_value = float(len(sub1_records) * (global_sum / total_records if total_records > 0 else 0))
+                
+                # Calculate values for sub2
+                sub2_value = 0.0
+                if sub2_records and resolved_value_col and resolved_value_col in df.columns:
+                    sub2_value = float(df.loc[sub2_records][resolved_value_col].sum())
+                else:
+                    sub2_value = float(len(sub2_records) * (global_sum / total_records if total_records > 0 else 0))
+                
+                # Convert indexes to serializable format
+                sub1_records_serialized = [int(x) if str(x).isdigit() else x for x in sub1_records]
+                sub2_records_serialized = [int(x) if str(x).isdigit() else x for x in sub2_records]
+                
+                # Create sub-elements
                 sub_elements = [
-                    {"name": cat_def["sub1"], "value": cat_value * sub_fractions[0], "count": max(1, math.floor(cat_count * sub_fractions[0])), "children": []},
-                    {"name": cat_def["sub2"], "value": cat_value * sub_fractions[1], "count": max(1, math.floor(cat_count * sub_fractions[1])), "children": []}
+                    {"name": sub1_name, "value": sub1_value, "count": len(sub1_records), "children": [], "records": sub1_records_serialized},
+                    {"name": sub2_name, "value": sub2_value, "count": len(sub2_records), "children": [], "records": sub2_records_serialized}
                 ]
+                
+                # Calculate total for this category
+                cat_value = sub1_value + sub2_value
+                cat_count = len(sub1_records) + len(sub2_records)
+                
                 children_nodes.append({
-                    "name": cat_def["name"], 
+                    "name": cat["name"], 
                     "value": cat_value, 
                     "count": cat_count, 
-                    "children": sub_elements
+                    "children": sub_elements,
+                    "records": sub1_records_serialized + sub2_records_serialized
                 })
             
             cursor.close()
             conn.close()
             
+            # Store table name for transaction queries
             return jsonify({
                 "name": exception_name, 
                 "value": global_sum, 
@@ -546,29 +751,90 @@ def get_tree_data(exception_name):
         print(f"Error in get_tree_data: {traceback.format_exc()}")
         return generate_mock_tree(exception_name, target)
 
+def get_deterministic_mock_data(exception_name, target):
+    # Save standard random state
+    state = random.getstate()
+    # Create seed value from exception_name
+    seed_val = 0
+    for char in exception_name:
+        seed_val = (seed_val * 31 + ord(char)) & 0xFFFFFFFF
+    random.seed(seed_val)
+    
+    total_records = random.randint(20, 45)
+    
+    cats = target["cats"]
+    flat_subs = []
+    for cat in cats:
+        flat_subs.append((cat["name"], cat["sub1"]))
+        flat_subs.append((cat["name"], cat["sub2"]))
+        
+    mock_records = []
+    for i in range(total_records):
+        cat_name, sub_name = flat_subs[i % len(flat_subs)]
+        
+        if sub_name in MOCK_COMMENTS_MAP:
+            comment = random.choice(MOCK_COMMENTS_MAP[sub_name])
+        else:
+            comment = "Transaction processed successfully."
+            
+        txn = {
+            "transaction_id": f"TXN-{10000 + i}",
+            "Document Number": f"DOC-{5000 + i}",
+            "Amount": round(random.uniform(1000, 15000), 2),
+            "Date": f"2026-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}",
+            "Vendor/Customer": f"Vendor-{100 + i}",
+            "Category": cat_name,
+            "Sub-Category": sub_name,
+            "Status": random.choice(["Open", "Completed", "Pending Review", "Approved"]),
+            "Comment": comment
+        }
+        mock_records.append(txn)
+        
+    # Restore standard random state
+    random.setstate(state)
+    return mock_records
+
 def generate_mock_tree(exception_name, target):
     """Generate mock tree data when no database data is available"""
-    total_records = random.randint(10, 50)
-    global_sum = random.randint(50000, 200000)
+    mock_records = get_deterministic_mock_data(exception_name, target)
+    
+    total_records = len(mock_records)
+    global_sum = sum(r["Amount"] for r in mock_records)
     
     children_nodes = []
-    fractions = [0.45, 0.35, 0.20]
-    sub_fractions = [0.60, 0.40]
-    
-    for i, cat_def in enumerate(target["cats"]):
-        cat_weight = fractions[i % len(fractions)]
-        cat_value = global_sum * cat_weight
-        cat_count = max(1, math.floor(total_records * cat_weight))
+    for cat in target["cats"]:
+        cat_name = cat["name"]
+        sub1_name = cat["sub1"]
+        sub2_name = cat["sub2"]
+        
+        # Filter matching mock records
+        sub1_recs = [r for r in mock_records if r["Category"] == cat_name and r["Sub-Category"] == sub1_name]
+        sub2_recs = [r for r in mock_records if r["Category"] == cat_name and r["Sub-Category"] == sub2_name]
+        
+        sub1_count = len(sub1_recs)
+        sub2_count = len(sub2_recs)
+        
+        sub1_value = sum(r["Amount"] for r in sub1_recs)
+        sub2_value = sum(r["Amount"] for r in sub2_recs)
+        
+        # We can store index positions in the records field
+        sub1_records_serialized = [mock_records.index(r) for r in sub1_recs]
+        sub2_records_serialized = [mock_records.index(r) for r in sub2_recs]
         
         sub_elements = [
-            {"name": cat_def["sub1"], "value": cat_value * sub_fractions[0], "count": max(1, math.floor(cat_count * sub_fractions[0])), "children": []},
-            {"name": cat_def["sub2"], "value": cat_value * sub_fractions[1], "count": max(1, math.floor(cat_count * sub_fractions[1])), "children": []}
+            {"name": sub1_name, "value": sub1_value, "count": sub1_count, "children": [], "records": sub1_records_serialized},
+            {"name": sub2_name, "value": sub2_value, "count": sub2_count, "children": [], "records": sub2_records_serialized}
         ]
+        
+        cat_count = sub1_count + sub2_count
+        cat_value = sub1_value + sub2_value
+        
         children_nodes.append({
-            "name": cat_def["name"], 
+            "name": cat_name, 
             "value": cat_value, 
             "count": cat_count, 
-            "children": sub_elements
+            "children": sub_elements,
+            "records": sub1_records_serialized + sub2_records_serialized
         })
     
     return jsonify({
@@ -581,13 +847,76 @@ def generate_mock_tree(exception_name, target):
         "is_mock": True
     })
 
-@app.route('/rca/transactions/<path:exception_name>', methods=['GET'])
+@app.route('/rca/transactions/<path:exception_name>', methods=['GET', 'POST'])
 def get_transactions(exception_name):
     try:
         target = AUDIT_RISK_MAP.get(exception_name)
         if not target:
             return jsonify({"error": f"Exception '{exception_name}' not found"}), 404
         
+        # Handle POST for comment updates
+        if request.method == 'POST':
+            data = request.get_json()
+            if not data or 'transaction_id' not in data or 'comment' not in data:
+                return jsonify({"error": "Missing required fields: transaction_id, comment"}), 400
+            
+            conn = get_db_connection()
+            if not conn:
+                return jsonify({"error": "Database connection failed"}), 500
+            
+            cursor = conn.cursor()
+            try:
+                matched_table, _ = resolve_table_and_column(cursor, target)
+                if not matched_table:
+                    return jsonify({"error": "Table not found"}), 404
+                
+                # Get the transaction to find the ID column
+                query = f'SELECT * FROM "{matched_table}" LIMIT 1'
+                cursor.execute(query)
+                columns = [desc[0] for desc in cursor.description]
+                
+                # Find the ID column
+                id_column = None
+                for col in columns:
+                    if 'id' in col.lower() or 'transaction_id' in col.lower() or 'doc_number' in col.lower():
+                        id_column = col
+                        break
+                
+                if not id_column:
+                    id_column = columns[0]  # Use first column as fallback
+                
+                # Check if comment column exists
+                cursor.execute("""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_schema = %s AND table_name = %s AND (column_name = 'auditee_comment' OR column_name = 'comment')
+                """, (SCHEMA_NAME, matched_table))
+                rows = cursor.fetchall()
+                cols = [r[0] for r in rows]
+                comment_col = 'auditee_comment' if 'auditee_comment' in cols else ('comment' if 'comment' in cols else None)
+                
+                if not comment_col:
+                    # Add comment column
+                    cursor.execute(f'ALTER TABLE "{matched_table}" ADD COLUMN IF NOT EXISTS auditee_comment TEXT')
+                    conn.commit()
+                    comment_col = 'auditee_comment'
+                
+                # Update the comment
+                update_query = f'UPDATE "{matched_table}" SET "{comment_col}" = %s WHERE "{id_column}" = %s'
+                cursor.execute(update_query, (data['comment'], data['transaction_id']))
+                conn.commit()
+                
+                cursor.close()
+                conn.close()
+                return jsonify({"success": True, "message": "Comment updated successfully"})
+                
+            except Exception as e:
+                print(f"Error updating comment: {traceback.format_exc()}")
+                cursor.close()
+                conn.close()
+                return jsonify({"error": str(e)}), 500
+        
+        # GET method - fetch transactions
         conn = get_db_connection()
         if not conn:
             return generate_mock_transactions(exception_name, target)
@@ -601,15 +930,18 @@ def get_transactions(exception_name):
                 conn.close()
                 return generate_mock_transactions(exception_name, target)
             
+            # Get filter parameters
+            category = request.args.get('category')
+            sub_category = request.args.get('sub_category')
+            
             # Get all data from the table
             query = f'SELECT * FROM "{matched_table}"'
             
-            # Use pandas with SQLAlchemy connection
+            # Read data with pandas
             try:
                 df = pd.read_sql_query(query, conn)
             except Exception as e:
                 print(f"Error reading with pandas: {e}")
-                # Fallback to manual fetch
                 cursor.execute(query)
                 columns = [desc[0] for desc in cursor.description]
                 rows = cursor.fetchall()
@@ -620,55 +952,74 @@ def get_transactions(exception_name):
                 conn.close()
                 return generate_mock_transactions(exception_name, target)
             
-            # Check for comment column
+            # Categorize records using shared classify_dataframe helper
+            classifications = classify_dataframe(df, target)
+            
+            # Filter by category and sub_category parameters if provided
+            if category or sub_category:
+                filtered_indices = []
+                for idx, (c, s) in classifications.items():
+                    match = True
+                    if category and c.lower() != category.lower():
+                        match = False
+                    if sub_category and s.lower() != sub_category.lower():
+                        match = False
+                    if match:
+                        filtered_indices.append(idx)
+                
+                if filtered_indices:
+                    df = df.loc[filtered_indices]
+                else:
+                    df = df.iloc[0:0] # empty dataframe preserving columns
+            
+            # Check for comment column in the table
             comment_col = None
             for col in df.columns:
-                if col.lower() == 'comment':
+                if col.lower() == 'auditee_comment':
                     comment_col = col
                     break
-            
-            # If comment column exists, fill empty comments with mock comments
+            if not comment_col:
+                for col in df.columns:
+                    if col.lower() == 'comment':
+                        comment_col = col
+                        break
+                    
             if comment_col:
-                parent_filter = request.args.get('parent')
-                child_filter = request.args.get('child')
-                comment_key = child_filter or parent_filter
-                
-                if comment_key and comment_key in MOCK_COMMENTS_MAP:
-                    mock_variants = MOCK_COMMENTS_MAP[comment_key]
-                else:
-                    all_comments = []
-                    for key in MOCK_COMMENTS_MAP:
-                        all_comments.extend(MOCK_COMMENTS_MAP[key])
-                    mock_variants = all_comments if all_comments else ["No comment provided."]
-                
-                for idx in range(len(df)):
-                    db_comment = str(df.iloc[idx][comment_col]).strip() if pd.notna(df.iloc[idx][comment_col]) else ""
-                    if not db_comment or db_comment == '' or db_comment == 'nan' or db_comment == 'None':
-                        mock_comment = mock_variants[idx % len(mock_variants)]
+                # Clean and fill comment column if null/empty
+                for idx in df.index:
+                    db_comment = str(df.at[idx, comment_col]).strip() if pd.notna(df.at[idx, comment_col]) else ""
+                    if not db_comment or db_comment.lower() in ['', 'nan', 'none']:
+                        # Assign mock comment based on classified subcategory
+                        _, sub_name = classifications[idx]
+                        mock_variants = MOCK_COMMENTS_MAP.get(sub_name, ["Transaction processed successfully.", "Compliance trace compliant."])
+                        # Use deterministic index based on row position to keep it consistent
+                        pos = list(df.index).index(idx)
+                        mock_comment = mock_variants[pos % len(mock_variants)]
                         df.at[idx, comment_col] = mock_comment
                 
+                # Make sure the display column name is 'Comment'
                 if comment_col != 'Comment':
+                    # If 'Comment' or 'comment' is another column in the DataFrame, rename it to 'Original Comment' to avoid duplicate column conflicts
+                    for c in df.columns:
+                        if c != comment_col and c.lower() == 'comment':
+                            df = df.rename(columns={c: 'Original Comment'})
                     df = df.rename(columns={comment_col: 'Comment'})
             else:
-                parent_filter = request.args.get('parent')
-                child_filter = request.args.get('child')
-                comment_key = child_filter or parent_filter
-                
-                if comment_key and comment_key in MOCK_COMMENTS_MAP:
-                    mock_variants = MOCK_COMMENTS_MAP[comment_key]
-                else:
-                    all_comments = []
-                    for key in MOCK_COMMENTS_MAP:
-                        all_comments.extend(MOCK_COMMENTS_MAP[key])
-                    mock_variants = all_comments if all_comments else ["No comment provided."]
-                
+                # No comment column exists, create it and fill with mock comments
                 comments = []
-                for idx in range(len(df)):
-                    mock_comment = mock_variants[idx % len(mock_variants)]
+                for pos, idx in enumerate(df.index):
+                    _, sub_name = classifications[idx]
+                    mock_variants = MOCK_COMMENTS_MAP.get(sub_name, ["Transaction processed successfully.", "Compliance trace compliant."])
+                    mock_comment = mock_variants[pos % len(mock_variants)]
                     comments.append(mock_comment)
                 df['Comment'] = comments
             
-            df = df.fillna("")
+            # Clean dataframe to make it JSON-serializable (Crucial fix for ValueError: NaTType does not support timetuple)
+            for col in df.columns:
+                if pd.api.types.is_datetime64_any_dtype(df[col]):
+                    df[col] = df[col].dt.strftime('%Y-%m-%d %H:%M:%S').fillna("")
+                else:
+                    df[col] = df[col].astype(object).where(df[col].notna(), "")
             
             cursor.close()
             conn.close()
@@ -686,7 +1037,15 @@ def get_transactions(exception_name):
                     headers={"Content-Disposition": f"attachment;filename={exception_name}_transactions.csv"}
                 )
             
-            return jsonify(df.to_dict(orient='records'))
+            # Convert DataFrame to dict with transaction IDs preserved
+            records = df.to_dict(orient='records')
+            
+            # Add a unique identifier for each transaction
+            for i, record in enumerate(records):
+                if 'id' not in record and 'transaction_id' not in record and 'doc_number' not in record:
+                    record['transaction_id'] = f"TXN_{i+1}"
+            
+            return jsonify(records)
             
         except Exception as e:
             print(f"Error in get_transactions: {traceback.format_exc()}")
@@ -700,50 +1059,125 @@ def get_transactions(exception_name):
 
 def generate_mock_transactions(exception_name, target):
     """Generate mock transactions when no database data is available"""
-    mock_data = []
-    categories = target.get("cats", [])
+    mock_records = get_deterministic_mock_data(exception_name, target)
     
-    sub_category_pool = []
-    for cat in categories:
-        sub_category_pool.append({"category": cat["name"], "sub": cat["sub1"]})
-        sub_category_pool.append({"category": cat["name"], "sub": cat["sub2"]})
+    # Filter by category and sub_category parameters if provided
+    category = request.args.get('category')
+    sub_category = request.args.get('sub_category')
     
-    used_combinations = set()
-    total_records = random.randint(10, 30)
-    
-    for i in range(total_records):
-        if sub_category_pool:
-            available = [item for item in sub_category_pool if f"{item['category']}-{item['sub']}" not in used_combinations]
-            if not available:
-                used_combinations.clear()
-                available = sub_category_pool
-            selected = random.choice(available)
-            cat_name = selected["category"]
-            sub_name = selected["sub"]
-            used_combinations.add(f"{cat_name}-{sub_name}")
-        else:
-            cat_name = "Unknown Category"
-            sub_name = "Unknown Sub-Category"
+    filtered_records = mock_records
+    if category:
+        filtered_records = [r for r in filtered_records if r["Category"].lower() == category.lower()]
+    if sub_category:
+        filtered_records = [r for r in filtered_records if r["Sub-Category"].lower() == sub_category.lower()]
         
-        if sub_name in MOCK_COMMENTS_MAP:
-            comment = random.choice(MOCK_COMMENTS_MAP[sub_name])
-        else:
-            comment = random.choice(["Transaction processed successfully.", "System entry checked.", "Compliance trace compliant."])
+    return jsonify(filtered_records)
+
+@app.route('/rca/comment', methods=['POST'])
+def update_comment():
+    try:
+        data = request.get_json()
+        if not data or 'exception_name' not in data or 'transaction_id' not in data or 'comment' not in data:
+            return jsonify({"error": "Missing required fields"}), 400
         
-        transaction = {
-            "Transaction ID": f"TXN-{random.randint(10000, 99999)}",
-            "Document Number": f"DOC-{random.randint(1000, 9999)}",
-            "Amount": round(random.uniform(1000, 50000), 2),
-            "Date": f"2026-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}",
-            "Vendor/Customer": f"Vendor-{random.randint(100, 999)}",
-            "Category": cat_name,
-            "Sub-Category": sub_name,
-            "Status": random.choice(["Open", "Completed", "Pending Review", "Approved"]),
-            "Comment": comment
-        }
-        mock_data.append(transaction)
-    
-    return jsonify(mock_data)
+        exception_name = data['exception_name']
+        target = AUDIT_RISK_MAP.get(exception_name)
+        if not target:
+            return jsonify({"error": f"Exception '{exception_name}' not found"}), 404
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({"error": "Database connection failed"}), 500
+        
+        cursor = conn.cursor()
+        try:
+            matched_table, _ = resolve_table_and_column(cursor, target)
+            if not matched_table:
+                return jsonify({"error": "Table not found"}), 404
+            
+            # Check if comment column exists
+            cursor.execute("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_schema = %s AND table_name = %s AND (column_name = 'auditee_comment' OR column_name = 'comment')
+            """, (SCHEMA_NAME, matched_table))
+            rows = cursor.fetchall()
+            cols = [r[0] for r in rows]
+            comment_col = 'auditee_comment' if 'auditee_comment' in cols else ('comment' if 'comment' in cols else None)
+            
+            if not comment_col:
+                cursor.execute(f'ALTER TABLE "{matched_table}" ADD COLUMN IF NOT EXISTS auditee_comment TEXT')
+                conn.commit()
+                comment_col = 'auditee_comment'
+            
+            # Resolve the dynamic ID column of the table
+            cursor.execute(f'SELECT * FROM "{matched_table}" LIMIT 1')
+            columns = [desc[0] for desc in cursor.description]
+            id_column = None
+            for col in columns:
+                if 'id' in col.lower() or 'transaction_id' in col.lower() or 'doc_number' in col.lower():
+                    id_column = col
+                    break
+            if not id_column:
+                id_column = columns[0]
+            
+            # Update the comment
+            update_query = f'UPDATE "{matched_table}" SET "{comment_col}" = %s WHERE "{id_column}" = %s'
+            cursor.execute(update_query, (data['comment'], data['transaction_id']))
+            conn.commit()
+            
+            cursor.close()
+            conn.close()
+            return jsonify({"success": True, "message": "Comment updated successfully"})
+            
+        except Exception as e:
+            print(f"Error updating comment: {traceback.format_exc()}")
+            cursor.close()
+            conn.close()
+            return jsonify({"error": str(e)}), 500
+            
+    except Exception as e:
+        print(f"Error in update_comment: {traceback.format_exc()}")
+        return jsonify({"error": str(e)}), 500
+
+def log_db_schema():
+    import os
+    log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "db_info.log")
+    try:
+        conn = get_db_connection()
+        if not conn:
+            with open(log_path, "w", encoding="utf-8") as f:
+                f.write("Failed to connect to Neon database.\n")
+            return
+        
+        cursor = conn.cursor()
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = %s;", (SCHEMA_NAME,))
+        tables = [r[0] for r in cursor.fetchall()]
+        
+        lines = ["--- Database Schema Log ---", f"Schema: {SCHEMA_NAME}", f"Tables: {tables}"]
+        for t in tables:
+            cursor.execute(f'SELECT column_name FROM information_schema.columns WHERE table_schema = %s AND table_name = %s;', (SCHEMA_NAME, t))
+            cols = [r[0] for r in cursor.fetchall()]
+            lines.append(f"Table '{t}': {cols}")
+            
+            # Check row count
+            try:
+                cursor.execute(f'SELECT COUNT(*) FROM "{t}"')
+                cnt = cursor.fetchone()[0]
+                lines.append(f"  Count: {cnt}")
+            except Exception as e:
+                lines.append(f"  Count Error: {e}")
+                conn.rollback()
+                
+        cursor.close()
+        conn.close()
+        
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+    except Exception as e:
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(f"Schema inspection failed with error: {e}\n{traceback.format_exc()}\n")
 
 if __name__ == '__main__':
+    log_db_schema()
     app.run(host='127.0.0.1', port=5001, debug=True)

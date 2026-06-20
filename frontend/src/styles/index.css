@@ -277,3 +277,66 @@ body { font-family: var(--fb); background: var(--bg); color: var(--txt); min-hei
   .nav { padding: 0 14px; }
   .rca-container { grid-template-columns: 1fr; }
 }
+
+/* Comment editing styles */
+.comment-edit-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 380px;
+}
+
+.comment-text {
+  color: #10e08a;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comment-text:hover {
+  background: rgba(16, 224, 138, 0.1);
+}
+
+.comment-input {
+  background: var(--card2);
+  border: 1px solid var(--bdr2);
+  border-radius: 4px;
+  color: var(--txt);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: var(--fb);
+  width: 100%;
+  min-width: 150px;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+
+.comment-save-btn {
+  background: var(--teal);
+  border: none;
+  border-radius: 4px;
+  color: var(--bg);
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.comment-save-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(0, 212, 170, 0.3);
+}
+
+.comment-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
